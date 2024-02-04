@@ -11,7 +11,6 @@ import { Content } from "./styled/content";
 import { Footer } from "./styled/footer";
 import { CardEvent } from "../../common/enums";
 import { socket } from "../../context/socket";
-import { ChangeEvent, useState } from "react";
 
 type Props = {
   card: Card;

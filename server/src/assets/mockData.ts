@@ -1,5 +1,5 @@
-import { Card } from '../data/models/card';
-import { List } from '../data/models/list';
+import { Card } from "../data/models/card";
+import { List } from "../data/models/list";
 
 const toDo = new List("To do");
 
@@ -30,7 +30,7 @@ toDo.cards = [
   ),
   new Card(
     "Implement logging on server side",
-    "Expected result - implemented logging with 3 levels: info, warn, error. Should be implemented using Observer pattern. There should be 2 loggers: first will write only errors into console, second will write all logs into file"
+    "Expected result - implemented logging with 3 levels: info, warn, error. Should be implemented using Subscriber pattern. There should be 2 loggers: first will write only errors into console, second will write all logs into file"
   ),
   new Card(
     "Implement logging of reorder action",
@@ -44,7 +44,5 @@ inProgress.cards = [
     "Expected result - possibility to create a new list"
   ),
 ];
-
-
 
 export const lists = [toDo, inProgress];

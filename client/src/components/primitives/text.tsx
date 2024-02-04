@@ -19,7 +19,6 @@ export const Text = ({ onChange, text }: Props) => {
 
   const onEdit = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
-    onChange(e.target.value);
   };
 
   const changeDescription = () => {

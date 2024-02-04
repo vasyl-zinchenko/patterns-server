@@ -1,5 +1,5 @@
-import { Card } from '../data/models/card';
-import { List } from '../data/models/list';
+import { Card } from "../data/models/card";
+import { List } from "../data/models/list";
 
 export class ReorderService {
   public reorder<T>(items: T[], startIndex: number, endIndex: number): T[] {
@@ -41,15 +41,14 @@ export class ReorderService {
 
       return list;
     });
-
     return newLists;
   }
 
-  private remove<T>(items: T[], index: number): T[] {
+  public remove<T>(items: T[], index: number): T[] {
     return [...items.slice(0, index), ...items.slice(index + 1)];
   }
 
-  private insert<T>(items: T[], index: number, value: T): T[] {
+  public insert<T>(items: T[], index: number, value: T): T[] {
     return [...items.slice(0, index), value, ...items.slice(index)];
   }
 }

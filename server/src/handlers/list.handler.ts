@@ -1,10 +1,22 @@
-import type { Socket } from "socket.io";
-import * as fs from "fs";
+import type { Server, Socket } from "socket.io";
 import { ListEvent } from "../common/enums";
 import { List } from "../data/models/list";
 import { SocketHandler } from "./socket.handler";
+import { Publisher, FileLogger, ConsoleLogger } from "./subscriber.handler";
+import { Database } from "../data/database";
+import { ReorderService } from "../services/reorder.service";
 
 export class ListHandler extends SocketHandler {
+  publisher = new Publisher();
+  fileLogger = new FileLogger();
+  consoleLogger = new ConsoleLogger();
+
+  constructor(io: Server, db: Database, reorderService: ReorderService) {
+    super(io, db, reorderService);
+    this.publisher.subscribe(this.fileLogger);
+    this.publisher.subscribe(this.consoleLogger);
+  }
+
   public handleConnection(socket: Socket): void {
     socket.on(ListEvent.CREATE, this.createList.bind(this));
     socket.on(ListEvent.GET, this.getLists.bind(this));
@@ -30,16 +42,31 @@ export class ListHandler extends SocketHandler {
   }
 
   private createList(name: string): void {
-    const lists = this.db.getData();
-    const newList = new List(name);
-    this.db.setData(lists.concat(newList));
-    this.updateLists();
+    try {
+      if (!name) {
+        throw Error("Not found card name");
+      }
+
+      const lists = this.db.getData();
+      const newList = new List(name);
+
+      this.saveData(lists.concat(newList), `List created: ${name}`);
+    } catch (error) {
+      this.errorMessage(error);
+    }
   }
 
   private deleteList(name: string): void {
-    const lists = this.db.getData();
-    this.db.setData(lists.filter((list) => list.name !== name));
-    this.updateLists();
+    try {
+      const lists = this.db.getData();
+
+      this.saveData(
+        lists.filter((list) => list.name !== name),
+        `List deleted: ${name}`
+      );
+    } catch (error) {
+      this.errorMessage(error);
+    }
   }
 
   private renameList({
@@ -49,12 +76,28 @@ export class ListHandler extends SocketHandler {
     listId: string;
     newName: string;
   }): void {
-    const lists = this.db.getData();
-    const foundList = lists.find((list) => list.id === listId);
-    foundList.name = newName;
-    console.log(lists);
+    try {
+      const lists = this.db.getData();
+      const foundList = lists.find((list) => list.id === listId);
+      const oldName = foundList.name;
+      foundList.name = newName;
 
-    this.db.setData(lists);
+      this.saveData(lists, `List renamed: from "${oldName}" to "${newName}"`);
+    } catch (error) {
+      this.errorMessage(error);
+    }
+  }
+
+  private saveData(list: List[], message: string) {
+    this.db.setData(list);
     this.updateLists();
+    this.publisher.log({
+      type: "info",
+      message,
+    });
+  }
+
+  private errorMessage(error) {
+    this.publisher.log({ type: "error", message: error.message });
   }
 }

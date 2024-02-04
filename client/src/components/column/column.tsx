@@ -13,7 +13,6 @@ import { Title } from "../primitives/title";
 import { Footer } from "./components/footer";
 import { Container } from "./styled/container";
 import { Header } from "./styled/header";
-import { reorderService } from "../../services/reorder.service";
 import { CardEvent, ListEvent } from "../../common/enums";
 import { socket } from "../../context/socket";
 
